@@ -12,11 +12,11 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $query = Task::query();
-
+    
         // Filter by status
         if ($request->has('status')) {
             $status = $request->input('status');
-
+    
             // Ensure the provided status is valid (in:pending,in progress,completed)
             if (in_array($status, ['pending', 'in progress', 'completed'])) {
                 $query->where('status', $status);
@@ -24,21 +24,35 @@ class TaskController extends Controller
                 return response()->json(['error' => 'Invalid status value.'], 400);
             }
         }
-
+    
         // Filter by date
         if ($request->has('date')) {
             $date = $request->input('date');
-
+    
             // Ensure the provided date is in a valid format (Y-m-d)
             if (strtotime($date) === false) {
                 return response()->json(['error' => 'Invalid date format. Use Y-m-d.'], 400);
             }
-
+    
             $query->whereDate('due_date', $date);
         }
-
+    
+        // Filter by assigned user
+        if ($request->has('user_id')) {
+            $userId = $request->input('user_id');
+    
+            // Ensure the provided user ID is numeric
+            if (!is_numeric($userId)) {
+                return response()->json(['error' => 'Invalid user ID.'], 400);
+            }
+    
+            $query->whereHas('assignedUsers', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+        }
+    
         $tasks = $query->get();
-
+    
         return response()->json(['tasks' => $tasks], 200);
     }
 

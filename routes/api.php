@@ -19,7 +19,7 @@ use App\Http\Controllers\AuthController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/tasks/{taskId}/assign/{userId}', [TaskController::class, 'assignUser']);
-Route::match(['post', 'delete'], '/tasks/{taskId}/assign/{userId}', [TaskController::class, 'unassignUser']);
+Route::delete('/tasks/{taskId}/unassignUser/{userId}', [TaskController::class, 'unassignUser']);
 Route::patch('/tasks/{taskId}/change-status', [TaskController::class, 'changeStatus']);
 Route::resource('tasks', TaskController::class);
 Route::get('/user/{userId}/assigned-tasks', [TaskController::class, 'getAssignedTasks']); 
